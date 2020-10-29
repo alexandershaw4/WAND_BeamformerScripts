@@ -1,5 +1,7 @@
 function data = FieldtripLCMVBeamformer(mycfg)
 
+CleanFieldtripFromPaths;
+
 load(mycfg);
 
 % Full path to the fieldtrip toolbox
@@ -45,76 +47,6 @@ RunBeamformer = mycfg.ComputeBeamformer;
 [~,mri_name,~] = fileparts(mycfg.MRI);
 mri = load([SaveDir mri_name '_CoReg']);
 
-% % Now assumes you passed a nifti in analyse format
-% mri = ft_read_mri(mri_filename,'dataformat','nifti');
-% mri = ft_convert_units(mri,'cm');
-% 
-% % If pos (headfile) exist, just strep fid locs from it, otherwise manual
-% if ~isempty(head_filename)
-%     %fid_data = ft_read_headshape(head_filename,'format','polhemus_pos');
-%     %fid_data = ft_convert_units(fid_data,'cm');
-%     
-%     cfg = [];
-%     cfg.method = 'fiducial';
-%     cfg.coordsys = 'ctf';
-%     cfg.spmversion = 'spm12';
-%     
-%     %nasid = find(contains(lower(fid_data.fid.label),'nas'));
-%     %cfg.fiducial.nas = fid_data.fid.pos(nasid,:);
-%     
-%     %lpaid = find(contains(lower(fid_data.fid.label),'lpa'));
-%     %cfg.fiducial.lpa = fid_data.fid.pos(lpaid,:);
-% 
-%     %rpaid = find(contains(lower(fid_data.fid.label),'rpa'));
-%     %cfg.fiducial.rpa = fid_data.fid.pos(rpaid,:);
-%    
-%     cfg.method = 'interactive';
-%     mri = ft_volumerealign(cfg,mri);
-%     
-% else
-%     % Co-register the MRI manually first
-%     cfg          = [];
-%     cfg.method   = 'interactive';
-%     cfg.coordsys = 'ctf';
-%     mri = ft_volumerealign(cfg,mri);
-% end
-% 
-% if ~isempty(head_filename)
-%     % Read headshape data
-%     head_data = ft_read_headshape(head_filename,'format','polhemus_pos');
-%     head_data = ft_convert_units(head_data,'cm');
-% 
-%     % ft_determine_coordsys(mri, 'interactive', 'no')
-%     % ft_plot_headshape(head_data);
-% 
-%     cfg            = [];
-%     cfg.method                = 'headshape';
-%     cfg.headshape.interactive = 'no'; 
-%     cfg.headshape.icp         = 'yes'; 
-%     cfg.headshape.headshape   = head_data;
-%     cfg.coordsys              = 'ctf'; % 'ctf';
-%     cfg.spmversion            = 'spm12';
-%     cfg.viewresult            = 'yes';
-%     mri = ft_volumerealign(cfg, mri); 
-% end
-% 
-% % note - to avoid a popup/interactive window, i had to set line 52 of 
-% % ft_determine_coordsys to interactive = no
-% 
-% % ft_plot_headshape(head_data);
-% 
-% %cfg = [];
-% %mri = ft_volumereslice(cfg, mri);
-% 
-% % Save the coregistered mri - in the MEG preproc for now?!
-% [~,mri_name,~] = fileparts(mycfg.MRI);
-% save([SaveDir mri_name '_CoReg'], '-struct', 'mri')
-% 
-% 
-% % %visualise mri?
-% % cfg = []; ft_sourceplot(cfg,mri)
-
-
 % Segment the MRI
 %--------------------------------------------------------------------------
 cfg           = [];
@@ -156,10 +88,12 @@ elseif mycfg.UseKrish1mm
     fprintf('Using Krish 1mm AAL90-Masked Source model\n');
     AtlasMNI='/cubric/software/MEG/fieldtrip-20161011/template/atlas/aal/ROI_MNI_V4.nii';
     AtlasLabels={'Calcarine_L' 'Calcarine_R' 'Cuneus_L' 'Cuneus_R' 'Lingual_L' 'Lingual_R' 'Occipital_Sup_L' 'Occipital_Sup_R' 'Occipital_Mid_L' 'Occipital_Mid_R' 'Occipital_Inf_L' 'Occipital_Inf_R' 'Fusiform_L' 'Fusiform_R'};
+    %AtlasLabels = 'AllAtlasLabels';
     template =kMakeCustomTemplateSourceGrid([-6.4 6.4],[-11.5 -5.7],[-2.9 4.8],0.1,AtlasMNI,AtlasLabels,true);
+    %template =kMakeCustomTemplateSourceGrid([-6.4 6.4],[-11.5 -5.7],[-2.9 4.8],0.4,AtlasMNI,AtlasLabels,true);
     template_sourcemodel = ft_convert_units(template, 'mm');
     
-    save([SaveDir, 'sourcemodel_template'], '-struct', 'template_sourcemodel')    
+    save([SaveDir, 'sourcemodel_template'], '-struct', 'template_sourcemodel')        
 end
 
 % Compute (warp) & Save the Sourcemodel

@@ -48,8 +48,8 @@ mycfg.ComputeBeamformer = 1;
 
 % Define stimulus & frequency parameters
 %--------------------------------------------------------------------------
-mycfg.cov_fwin = [40 80];
-mycfg.cov_toi  = [-1.5 1.5];
+mycfg.cov_fwin = [30 80];
+mycfg.cov_toi  = [0 1.5];
 
 mycfg.trigger  = 'stim_on';  % trig/stim 
 mycfg.b_toi    = [-1.2 0];   % baseline times
@@ -71,11 +71,12 @@ unique_name = [mycfg.SaveSubDir unique_name];
 save(unique_name,'mycfg')
 
 % Compute the lead fields and beamformer on the cluster
-fprintf('Submitting job to cluster...');
+fprintf('Submitting job to cluster...\n');
 cd(mycfg.SaveSubDir);
 docluster_slurm_bfm('FieldtripLCMVBeamformer',unique_name);
 
-
+% or run locally:
+% FieldtripLCMVBeamformer(unique_name)
 
 
 

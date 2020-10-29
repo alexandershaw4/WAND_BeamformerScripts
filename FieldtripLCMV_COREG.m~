@@ -95,8 +95,10 @@ if ~isempty(head_filename)
     mri = ft_volumerealign(cfg, mri); 
 end
 
-
 close all;drawnow;
+ft_plot_headshape(head_data);hold on
+
+drawnow;
 
 % note - to avoid a popup/interactive window, i had to set line 52 of 
 % ft_determine_coordsys to interactive = no
