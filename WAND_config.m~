@@ -71,9 +71,8 @@ unique_name = [mycfg.SaveSubDir unique_name];
 save(unique_name,'mycfg')
 
 % Compute the lead fields and beamformer on the cluster
-fprintf('Submitting job to cluster...');
-cd(mycfg.SaveSubDir);
-docluster_slurm_bfm('FieldtripLCMVBeamformer',unique_name);
+fprintf('Submitting job to cluster...`
+FieldtripLCMVBeamformer(unique_name);
 
 
 

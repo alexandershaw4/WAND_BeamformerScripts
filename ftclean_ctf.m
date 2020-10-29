@@ -72,24 +72,47 @@ cfg.artfctdef.zvalue.hilbert    = 'yes';
 cfg.artfctdef.zvalue.interactive = 'no';
 [cfg, artifact_EOG] = ft_artifact_zvalue(cfg);
 
-% compile list of segments either with jumps or with EOG contam
-%----------------------------------------------------------------
-trl = cfg.artfctdef.zvalue.trl;
-art = [artifact_EOG ; artifact_jump ];
-bad = [];
-
-% find which trials corrspond to which bad segments
-
-for i = 1:size(art,1) % each bad chunk
-    x0  = findthenearest( art(i,1),trl(:,1) );
-    x1  = findthenearest( art(i,2),trl(:,2) );
-    tbad = min([x0 x1]):max([x0 x1]);
-    %tbad
-    bad = unique([bad(:); tbad(:) ]);
-end
 
 
-[newexcludelength] = ctf_write_BadTrials(bad, dataset);
+
+cfg.artfctdef.reject          = 'none', 'partial', 'complete', 'nan', or 'value' (default = 'complete')
+cfg.artfctdef.minaccepttim    = when using partial rejection, minimum length
+in seconds of remaining trial (default = 0.1)
+cfg.artfctdef.crittoilim      = when using complete rejection, reject trial only when artifacts occur within
+this time window (default = whole trial). This only works with in-memory data,
+since trial time axes are unknown for data on disk.
+cfg.artfctdef.feedback        = 'yes' or 'no' (default = 'no')
+cfg.artfctdef.invert          = 'yes' or 'no' (default = 'no')
+cfg.artfctdef.value           = scalar value to replace the data in the artifact segments (default = nan)
+cfg.artfctdef.eog.artifact    = Nx2 matrix with artifact segments, this is added to the cfg by using FT_ARTIFACT_EOG
+cfg.artfctdef.jump.artifact   = Nx2 matrix with artifact segments, this is added to the cfg by using FT_ARTIFACT_JUMP
+cfg.artfctdef.muscle.artifact = Nx2 matrix with artifact segments, this is added to the cfg by using FT_ARTIFACT_MUSCLE
+cfg.artfctdef.zvalue.artifact = Nx2 matrix with artifact segments, this is added to the cfg by using FT_ARTIFACT_ZVALUE
+cfg.artfctdef.visual.artifact = Nx2 matrix with artifact segments, this is added to the cfg by using FT_DATABROWSER
+cfg.artfctdef.xxx.artifact    = Nx2 matrix with artifact segments, this could be added by your own artifact detection function
+
+[cfg] = ft_rejectartifact(cfg, data)
+
+
+
+% % compile list of segments either with jumps or with EOG contam
+% %----------------------------------------------------------------
+% trl = cfg.artfctdef.zvalue.trl;
+% art = [artifact_EOG ; artifact_jump ];
+% bad = [];
+% 
+% % find which trials corrspond to which bad segments
+% 
+% for i = 1:size(art,1) % each bad chunk
+%     x0  = findthenearest( art(i,1),trl(:,1) );
+%     x1  = findthenearest( art(i,2),trl(:,2) );
+%     tbad = min([x0 x1]):max([x0 x1]);
+%     %tbad
+%     bad = unique([bad(:); tbad(:) ]);
+% end
+% 
+% 
+% [newexcludelength] = ctf_write_BadTrials(bad, dataset);
 
 
 
