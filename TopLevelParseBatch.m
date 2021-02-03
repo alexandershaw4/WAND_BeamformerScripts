@@ -8,7 +8,7 @@ missing_meg = [];
 missing_mri = [];
 missing_hs  = [];
 
-for i = 1:2;%:length(ID)
+for i = 1:5;%:length(ID)
     
     this = ID(i);
     
@@ -19,7 +19,7 @@ for i = 1:2;%:length(ID)
         fprintf('Has MRI, & MEG \n');
         
         local = strrep(this.path,'/cubric/collab/',...
-        '/cubric/scratch/sapas10/');
+        '/cubric/newscratch/314_wand/');
     
         file = 'CommonWeights';
         

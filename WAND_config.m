@@ -31,7 +31,7 @@ mycfg.sourcemodel = []; % (empty = use 4mm, or spec fullfile to .mat)
 % Alex temporary hack - can't save to the collab atm so make a home in
 % scratch
 mycfg.SaveSubDir = strrep(mycfg.SaveSubDir,'/cubric/collab/',...
-    '/cubric/scratch/sapas10/');
+    '/cubric/newscratch/314_wand/');
 unix(['mkdir -p ' mycfg.SaveSubDir]);
 
 

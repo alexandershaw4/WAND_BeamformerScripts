@@ -1,5 +1,6 @@
 function FieldtripLCMV_COREG(mycfg)
 
+CleanFieldtripFromPaths;
 
 % Full path to the fieldtrip toolbox
 %--------------------------------------------------------------------------
