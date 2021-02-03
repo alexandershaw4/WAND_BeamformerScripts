@@ -16,8 +16,10 @@ end
 CUB = dir('/cubric/software/MEG/fieldtrip*');
 
 for i = 1:length(CUB)
-    pth = [CUB(i).folder '/' CUB(i).name];
-    rmpath(genpath(pth));
+    try
+        pth = [CUB(i).folder '/' CUB(i).name];
+        rmpath(genpath(pth));
+    end
 end
 
 clear CUB j i p phrases pth these
