@@ -28,7 +28,7 @@ for i = 1:95;%:length(ID)
         continue;
     else
         
-        WAND_config(this.id);
+        %WAND_config(this.id);
     end
         
     else

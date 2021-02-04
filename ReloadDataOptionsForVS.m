@@ -94,7 +94,7 @@ if mycfg.Artifact
     
     % channel selection, cutoff and padding
     cfg.artfctdef.zvalue.channel     = 'EOG';
-    cfg.artfctdef.zvalue.cutoff      = 5;
+    cfg.artfctdef.zvalue.cutoff      = 12;%5
     cfg.artfctdef.zvalue.trlpadding  = 0;
     cfg.artfctdef.zvalue.artpadding  = 0.1;
     cfg.artfctdef.zvalue.fltpadding  = 0;
@@ -126,20 +126,10 @@ cfg_data.channel    = {'meg'};%{'-MRCNT*','-*STAT*','-MP*','-MM*','-MRSYN*'}';%{
 cfg_data.precision  = 'single';
 cfg_data.demean     = 'yes';
 cfg_data.bpfilter   = 'yes';
-cfg_data.bpfreq     = cov_foi;
+cfg_data.bpfreq     = [1 100];
 cfg_data.bpfilttype = 'but';
 cfg_data.bpfiltdir  = 'twopass';
 data_preproc        = ft_preprocessing(cfg_data);
-
-% Compute the covariance
-%--------------------------------------------------------------------------
-cfg = [];
-cfg.channel = {'MEG'};
-cfg.removemean = 'no';
-cfg.covariance = 'yes';
-cfg.covariancewindow = cov_toi;% [-1.5 1.5];
-data_tlck = ft_timelockanalysis(cfg, data_preproc);
-
 
 
 % Define baseline and stimulus epochs  -
