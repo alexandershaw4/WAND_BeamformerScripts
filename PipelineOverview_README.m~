@@ -13,12 +13,12 @@
 %      coregiatration, upon closing/completetion launches:
 %   4) FieldtripLCMVBeamformer.m: runs segmentation, creates headmodel,
 %   source model, lead fields and global beamformer weights (filters)
-%   *[note step (4) launches and runs entirely on the cluster when you 
-%    finish coregistration]
+%   [note step (4) launches and runs entirely on the cluster when you 
+    finish coregistration]
 %
 %
-% STEP 2: Identify peak-voxel from %-change contrasts (active vs baseline),
-% create virtual sensor, run timefrequency analysis and find peaks
+% STEP 2: Identify peak-voxel from %-change contrats (active vs baseline),
+% create virtual sensor, run timefrequency aalysis and find peaks
 %
 % 5) AutogenerateVirtualSensorsandTimeFreq.m - loops subjects, calls:
 %    6) FindVisualPeakMakeVS.m - finds peak, generates virtual sensor
