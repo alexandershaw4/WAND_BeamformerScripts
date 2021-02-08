@@ -40,6 +40,23 @@ for i = 1:length(IDs)
         ID(i).hasmri = 0;
     end
     
+    % double check  - sometimes i have copied the mri to the newscratch
+    % for those who have meg and i found MRs
+    if ID(i).hasmeg && ~ID(i).hasmri
+        fprintf('checking newscratch for mri...\n')
+        
+        ns = ['/cubric/newscratch/314_wand/314_wand/bids/sourcedata/'];
+        mri = ( dir([ns IDs{i} '/*.nii']) );
+        
+        if length(mri) > 0
+            ID(i).mri = [mri(1).folder '/' mri(1).name];
+            ID(i).hasmri = 1;
+            fprintf('Found MRI for %s in newscratch!\n',IDs{i});
+        end
+        
+    end
+    
+    
     % Check for headshape
     headshape = ( dir([basepth '/' IDs{i} bidshed '/*.pos']) );
     

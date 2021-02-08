@@ -36,5 +36,6 @@ for i = 1:length(list)
     PeakData(i) = p;
     
 end
-    
+    cd ~/WAND_VISUAL/
+save('PeakData','PeakData');
     

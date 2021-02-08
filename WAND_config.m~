@@ -19,12 +19,11 @@ if ischar(subject)
     niftis            = dir([wand subject '/mri/anat/*.nii']);
     mycfg.MRI         = ['/mri/anat/' niftis(1).name];
 elseif isstruct(subject)
-    mycfg.subject_dir = [wand subject.id];
+    mycfg.subject_dir = [subject.id];
     MEG               = subject.meg;
     mycfg.MEG         = MEG;
     niftis            = subject.mri;
     mycfg.MRI         = subject.mri;
-    subject = subject.id;
 end
 try
     heads             = dir([wand subject '/meg/generic/*.pos']);
@@ -33,10 +32,10 @@ catch
     mycfg.Headshape   = [];
 end
 
-
-mycfg.SaveSubDir  = [wand subject '/meg/' task '/preproc/'];
-mycfg.sourcemodel = []; % (empty = use 4mm, or spec fullfile to .mat)
-
+try
+    mycfg.SaveSubDir  = [wand subject '/meg/' task '/preproc/'];
+    mycfg.sourcemodel = []; % (empty = use 4mm, or spec fullfile to .mat)
+c
 % Alex temporary hack - can't save to the collab atm so make a home in
 % scratch
 mycfg.SaveSubDir = strrep(mycfg.SaveSubDir,'/cubric/collab/',...

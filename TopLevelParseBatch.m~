@@ -25,16 +25,12 @@ for i = 1:95;%:length(ID)
         
     if exist(local) && exist([local '/meg/visual/preproc/' file '.mat'])
         fprintf('ALREADY RUN!/n');
-        hasrun{i} = this.id;
         continue;
     elseif i == 33 || i == 71
         continue
     else
-        if contains(this.mri,'newscratch')
-            WAND_config(this);
-        else
-            WAND_config(this.id);
-        end
+        
+        WAND_config(this.id);
     end
         
     else

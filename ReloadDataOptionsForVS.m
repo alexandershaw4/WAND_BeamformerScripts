@@ -1,4 +1,4 @@
-function [tlck_actv,tlck_bsln] = ReloadDataOptionsForVS(mycfg)
+function [tlck_actv,tlck_bsln,nt] = ReloadDataOptionsForVS(mycfg)
 
 CleanFieldtripFromPaths;
 
@@ -118,6 +118,14 @@ if mycfg.Artifact
     
     [cfg_data] = ft_rejectartifact(cfg_data);
     
+end
+
+nt = [size(cfg_data.trl,1) size(cfg_data.trlold,1)];
+
+if isfield(mycfg,'reject_only') && mycfg.reject_only;
+    fprintf('Reject only flagged: returning...\n');
+    [tlck_actv,tlck_bsln]=deal([]);
+    return
 end
 
 % Pre-process the data

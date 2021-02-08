@@ -10,8 +10,17 @@ addpath(fieldtrip_path); cd(fieldtrip_path); ft_defaults
 % Reconstruct full file names
 %--------------------------------------------------------------------------
 sub_folder    = mycfg.subject_dir; 
-dataset       = [mycfg.subject_dir '/' mycfg.MEG];
-mri_filename  = [mycfg.subject_dir '/' mycfg.MRI];
+if exist(mycfg.MEG)
+    dataset = mycfg.MEG;
+else
+    dataset       = [mycfg.subject_dir '/' mycfg.MEG];
+end
+if exist(mycfg.MRI)
+    mri_filename = mycfg.MRI;
+else
+    mri_filename  = [mycfg.subject_dir '/' mycfg.MRI];
+end
+
 
 if ~isempty(mycfg.Headshape)
     head_filename = [mycfg.subject_dir '/' mycfg.Headshape];
