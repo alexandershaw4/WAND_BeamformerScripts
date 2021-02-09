@@ -36,19 +36,109 @@ trigs                   = ft_definetrial(cfg);
 
 trig_names = unique({trigs.event.type}); % Filter list
 
-if ismember(mycfg.trigger,trig_names)
-    fprintf('Found trigger: %s',mycfg.trigger);
+
+if strcmp(mycfg.trigger,lower('emg'))
+    % Reading EMG onset to set trial definition - this is a bit long
+    % winded....
+    %--------------------------------------------------------------------
+    hdr  = ft_read_header(dataset);
+    chanindx    = strmatch('EMG', hdr.label);
+    WindowToSearch = [-600 1200]; % Search around the EMG Marker for EMG Onsets
+    sdThreshold = 2.5;
+    
+    if length(chanindx)>1
+        error('only one EMG channel supported');
+    end
+    
+    cfg = [];
+    cfg.dataset = dataset;
+    cfg.trialdef.eventtype      = 'stim_off';
+    event=ft_definetrial(cfg);
+    
+    % read all data of the EMG channel, assume continuous file format
+    emg = ft_read_data(cfg.dataset, 'header', hdr, ...
+        'begsample', 1, 'endsample', hdr.nSamples*hdr.nTrials, ...
+        'chanindx', chanindx, 'checkboundary', false);
+    
+    % apply filtering, hilbert transformation and boxcar convolution (for smoothing)
+    emgflt      = ft_preproc_bandpassfilter(emg, hdr.Fs, [15 150]); % bandpassfilter
+    emgnth      = ft_preproc_bandstopfilter(emgflt,hdr.Fs, [48 52]);% notch filter
+    emgrect     = abs(emgnth);
+    
+    mark = [];
+    for i = 1 : length(event.trl)
+        ss = event.trl(i,1) + (WindowToSearch (1)); %Get the first sample to search
+        es = event.trl(i,1) + (WindowToSearch (2)); %Get the Last sample to search
+        RTdiff(i) = inf;
+        
+        noise = mean(emgrect(ss:es));
+        noisesd = std(emgrect(ss:es));
+        noisethresh = (noise + (sdThreshold * noisesd));
+        absmax = max(abs(emgnth(ss:es)));
+        
+        for j = ss : es
+            if emgrect(j) > noisethresh
+                mark = [mark j];
+                RTdiff(i) = (j - event.trl(i,1));
+                break
+            end
+        end
+    end
+    
+    % make a new set of events
+    for i = 1:length(mark)
+        ev(i).type   = 'EMG_trig';
+        ev(i).sample = mark(i);
+        ev(i).value  = 1;
+        ev(i).duration = [];
+        ev(i).offset = [];
+    end
+    
+    cfg                     = [];
+    cfg.dataset             = dataset;    
+    cfg.trialdef.prestim    = abs(bsln_toi(1));
+    cfg.trialdef.poststim   = abs(actv_toi(2));
+    
+    event=ev;
+    trl=[];
+    for i=1:length(event)
+                % add this to the trl definition
+                begsample     = event(i).sample - cfg.trialdef.prestim*hdr.Fs;
+                endsample     = event(i).sample + cfg.trialdef.poststim*hdr.Fs - 1;
+                offset        = -cfg.trialdef.prestim*hdr.Fs;
+                trigger       = event(i).value; % remember the trigger (=condition) for each trial
+                if isempty(trl)
+                    prevtrigger = nan;
+                else
+                    prevtrigger   = trl(end, 4); % the condition of the previous trial
+                end
+                trl(end+1, :) = [round([begsample endsample offset])  trigger prevtrigger];
+    end
+    
+    cfg.trl = trl;
+    cfg_data                = ft_definetrial(cfg);
+    
+else
+    if ismember(mycfg.trigger,trig_names)
+        fprintf('Found trigger: %s',mycfg.trigger);
+    end
+    cfg                     = [];
+    cfg.dataset             = dataset;
+    cfg.trialdef.eventtype  = mycfg.trigger;
+    cfg.trialdef.prestim    = abs(bsln_toi(1));   ...  * ^
+    cfg.trialdef.poststim   = abs(actv_toi(2));   ...  * ^
+    cfg_data                = ft_definetrial(cfg);
 end
 
 
-% Now we know the triggers exist, define trials
-%--------------------------------------------------------------------------
-cfg                     = [];
-cfg.dataset             = dataset;
-cfg.trialdef.eventtype  = mycfg.trigger;
-cfg.trialdef.prestim    = abs(bsln_toi(1));   ...  * ^
-cfg.trialdef.poststim   = abs(actv_toi(2));   ...  * ^
-cfg_data                = ft_definetrial(cfg);
+% % Now we know the triggers exist, define trials
+% %--------------------------------------------------------------------------
+% cfg                     = [];
+% cfg.dataset             = dataset;
+% cfg.trialdef.eventtype  = mycfg.trigger;
+% cfg.trialdef.prestim    = abs(bsln_toi(1));   ...  * ^
+% cfg.trialdef.poststim   = abs(actv_toi(2));   ...  * ^
+% cfg_data                = ft_definetrial(cfg);
 
 % *^Ok, maybe this could be a different parameter, but by deault I assume
 % you'd want the length of a given trial to be beginning-of-baseline to end

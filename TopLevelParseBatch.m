@@ -13,7 +13,7 @@ missing_meg = [];
 missing_mri = [];
 missing_hs  = [];
 
-for i = 1:length(ID)
+for i = 7:length(ID)
     
     this = ID(i);
     
