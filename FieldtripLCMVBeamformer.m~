@@ -58,6 +58,7 @@ mri = load([SaveDir mri_name '_CoReg']);
 
 % Segment the MRI
 %--------------------------------------------------------------------------
+
 cfg           = [];
 cfg.output    = {'brain'; 'skull'; 'scalp'};
 mri_segmented = ft_volumesegment(cfg, mri);
@@ -85,9 +86,9 @@ if ~mycfg.UseKrish1mm
     %load(sourcemodel)
     %tmp = whos('-file',sourcemodel);
     %template_sourcemodel = eval(tmp.name);
-    load(sourcemodel)
+    load(template_sourcemodel)
     template_sourcemodel = ft_convert_units(sourcemodel, 'cm');
-    %clear(tmp.name,'tmp')
+    clear(tmp.name,'tmp')
 
     % Save template sourcemodel
     save([SaveDir, 'sourcemodel_template'], '-struct', 'template_sourcemodel')

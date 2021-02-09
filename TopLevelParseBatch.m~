@@ -1,7 +1,12 @@
 
 addpath('~/code/WAND_BeamformerScripts/');
 
-ID = checkWANDvisual;
+task = 'motor'; % {'visual' or 'motor'}
+
+switch task ; 
+    case 'motor'; ID = checkWANDmotor;
+    case 'viual'; ID = checkWANDvisual;
+end
 
 notrun = [];
 missing_meg = [];
@@ -25,12 +30,21 @@ for i = 1:95;%:length(ID)
         
     if exist(local) && exist([local '/meg/visual/preproc/' file '.mat'])
         fprintf('ALREADY RUN!/n');
+        hasrun{i} = this.id;
         continue;
-    elseif i == 33 || i == 71
-        continue
+    %elseif i == 33 || i == 71
+    %    continue
     else
-        
-        WAND_config(this.id);
+        if contains(this.mri,'newscratch')
+            switch task
+                case 'visual'; WAND_config(this);
+                case 'motor' ; WAND_config_motor(this);
+            end
+        else
+            switch task
+                case 'visual'; WAND_config(this.id);
+                case 'motor';  WAND_config
+        end
     end
         
     else

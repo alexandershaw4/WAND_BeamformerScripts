@@ -1,14 +1,19 @@
 
 addpath('~/code/WAND_BeamformerScripts/');
 
-ID = checkWANDvisual;
+task = 'auditorymotor'; % {'visual' or 'auditorymotor'}
+
+switch task 
+    case 'auditorymotor'; ID = checkWANDmotor;
+    case 'visual'; ID = checkWANDvisual;
+end
 
 notrun = [];
 missing_meg = [];
 missing_mri = [];
 missing_hs  = [];
 
-for i = 1:95;%:length(ID)
+for i = 1:length(ID)
     
     this = ID(i);
     
@@ -21,19 +26,29 @@ for i = 1:95;%:length(ID)
         local = strrep(this.path,'/cubric/collab/',...
         '/cubric/newscratch/314_wand/');
     
-        file = 'CommonWeights';
+        switch task
+            case 'visual'; file = 'CommonWeights';
+            case 'auditorymotor'; file = 'PMBR_CommonWeights';
+        end
         
-    if exist(local) && exist([local '/meg/visual/preproc/' file '.mat'])
+        
+    if exist(local) && exist([local '/meg/' lower(task) '/preproc/' file '.mat'])
         fprintf('ALREADY RUN!/n');
         hasrun{i} = this.id;
         continue;
-    elseif i == 33 || i == 71
-        continue
+    %elseif i == 33 || i == 71
+    %    continue
     else
         if contains(this.mri,'newscratch')
-            WAND_config(this);
+            switch task
+                case 'visual'; WAND_config(this);
+                case 'auditorymotor' ; WAND_config_motor(this);
+            end
         else
-            WAND_config(this.id);
+            switch task
+                case 'visual'; WAND_config(this.id);
+                case 'auditorymotor';  WAND_config_motor(this.id);
+            end
         end
     end
         
