@@ -23,21 +23,29 @@ end
 cfg.baseline = 'relchange';
 cfg.sampletimes = ftve.time{1};
 cfg.fsample = ftve.fsample;
-cfg.filterorder = 4;
-FoI = 0.125:.125:90;
+cfg.filterorder = 3;
+FoI = 1:.125:50;
 
 MatDat = cat(1,ftve.trial{:});
 
 tf = bert_singlechannel(MatDat,cfg,FoI,[-1.25 -0.5]);
 
-figure;p=plotbert(ftve.time{1},tf.freqs,tf.agram);
+agram = tf.agram;
+
+% suppress effects in the opposite direction of interest
+switch upper(response)
+    case 'MRBD'; agram(agram>0)=0;
+    case 'PMBR'; agram(agram<0)=0;
+end
+
+figure;p=plotbert(ftve.time{1},tf.freqs,agram);
 
 if saveim
     export_fig(name,'-dpng','-m2','-nocrop');
     savefig(name);
 end
 
-m = tf.agram;
+m = agram;
 
 for i = 1:size(woi,1)
     pks(i).woi = woi(i,:);
