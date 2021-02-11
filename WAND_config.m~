@@ -6,6 +6,8 @@ wand    = '/cubric/collab/314_wand/bids/sourcedata/';
 %subject = '314_05117';
 task    = 'visual';    
 
+runoncluster = 0;
+
 % task = 'visual' 'auditorymotor' 'day3' 
 %        'dotback' 'mmn' 'resting' 'simon' 'sternberg'
 
@@ -19,11 +21,12 @@ if ischar(subject)
     niftis            = dir([wand subject '/mri/anat/*.nii']);
     mycfg.MRI         = ['/mri/anat/' niftis(1).name];
 elseif isstruct(subject)
-    mycfg.subject_dir = [subject.id];
+    mycfg.subject_dir = [wand subject.id];
     MEG               = subject.meg;
     mycfg.MEG         = MEG;
     niftis            = subject.mri;
     mycfg.MRI         = subject.mri;
+    subject = subject.id;
 end
 try
     heads             = dir([wand subject '/meg/generic/*.pos']);
@@ -32,10 +35,10 @@ catch
     mycfg.Headshape   = [];
 end
 
-try
-    mycfg.SaveSubDir  = [wand subject '/meg/' task '/preproc/'];
-    mycfg.sourcemodel = []; % (empty = use 4mm, or spec fullfile to .mat)
-c
+
+mycfg.SaveSubDir  = [wand subject '/meg/' task '/preproc/'];
+mycfg.sourcemodel = []; % (empty = use 4mm, or spec fullfile to .mat)
+
 % Alex temporary hack - can't save to the collab atm so make a home in
 % scratch
 mycfg.SaveSubDir = strrep(mycfg.SaveSubDir,'/cubric/collab/',...
@@ -65,6 +68,10 @@ mycfg.a_toi    = [0.3 1.5];  % active times
 
 mycfg.UseKrish1mm = 1;
 mycfg.Artifact = true;
+mycfg.ManualReject=1;
+% New - rejection thresholds
+mycfg.eogthreshold  = 5;  % 5
+mycfg.jumpthreshold = 35;  % 35
 
 % the manual local part - coregistration
 if isempty(dir([mycfg.SaveSubDir '*CoReg.mat']))
@@ -79,10 +86,14 @@ unique_name = [mycfg.SaveSubDir unique_name];
 save(unique_name,'mycfg')
 
 % Compute the lead fields and beamformer on the cluster
-fprintf('Submitting job to cluster...\n');
-cd(mycfg.SaveSubDir);
-docluster_slurm_bfm('FieldtripLCMVBeamformer',unique_name);
 
+cd(mycfg.SaveSubDir);
+if runoncluster
+    fprintf('Submitting job to cluster...\n');
+    docluster_slurm_bfm('FieldtripLCMVBeamformer',unique_name);
+else
+    feval('FieldtripLCMVBeamformer',unique_name);
+end
 % or run locally:
 % FieldtripLCMVBeamformer(unique_name)
 

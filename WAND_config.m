@@ -6,6 +6,17 @@ wand    = '/cubric/collab/314_wand/bids/sourcedata/';
 %subject = '314_05117';
 task    = 'visual';    
 
+runoncluster = 1;
+mycfg.ComputeBeamformer = 1;
+
+mycfg.UseKrish1mm = 1;
+mycfg.Artifact = true;
+mycfg.ManualReject=0;
+
+% New - rejection thresholds
+mycfg.eogthreshold  = 4;  % 5
+mycfg.jumpthreshold = 20;  % 35
+
 % task = 'visual' 'auditorymotor' 'day3' 
 %        'dotback' 'mmn' 'resting' 'simon' 'sternberg'
 
@@ -49,7 +60,6 @@ unix(['mkdir -p ' mycfg.SaveSubDir]);
 % can set ComputeBeamformer = 1 and specify your data / contrast parameters
 % below.
 
-mycfg.ComputeBeamformer = 1;
 
 % Optional: Only needed if mycfg.ComputeBeamformer = 1 ... 
 %==========================================================================
@@ -64,8 +74,7 @@ mycfg.trigger  = 'stim_on';  % trig/stim
 mycfg.b_toi    = [-1.2 0];   % baseline times
 mycfg.a_toi    = [0.3 1.5];  % active times
 
-mycfg.UseKrish1mm = 1;
-mycfg.Artifact = true;
+
 
 % the manual local part - coregistration
 if isempty(dir([mycfg.SaveSubDir '*CoReg.mat']))
@@ -80,10 +89,14 @@ unique_name = [mycfg.SaveSubDir unique_name];
 save(unique_name,'mycfg')
 
 % Compute the lead fields and beamformer on the cluster
-fprintf('Submitting job to cluster...\n');
-cd(mycfg.SaveSubDir);
-docluster_slurm_bfm('FieldtripLCMVBeamformer',unique_name);
 
+cd(mycfg.SaveSubDir);
+if runoncluster
+    fprintf('Submitting job to cluster...\n');
+    docluster_slurm_bfm('FieldtripLCMVBeamformer',unique_name);
+else
+    feval('FieldtripLCMVBeamformer',unique_name);
+end
 % or run locally:
 % FieldtripLCMVBeamformer(unique_name)
 

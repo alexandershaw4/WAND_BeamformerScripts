@@ -1,7 +1,7 @@
 function C = docurvature(M)
 % Computes the curvature of a mesh
 %
-%
+% 
 
 A = spm_mesh_adjacency(M);
 A = sparse(1:size(M.vertices,1),1:size(M.vertices,1),1./sum(A,2)) * A;

@@ -6,6 +6,16 @@ wand    = '/cubric/collab/314_wand/bids/sourcedata/';
 %subject = '314_05117';
 task    = 'auditorymotor';    
 
+runoncluster = 1;
+mycfg.ComputeBeamformer = 1;
+mycfg.UseKrish1mm = 0;
+mycfg.Artifact = true;
+mycfg.ManualReject=0;
+
+% New - rejection thresholds
+mycfg.eogthreshold  = 5;  % 5
+mycfg.jumpthreshold = 20;  % 35
+
 % task = 'visual' 'auditorymotor' 'day3' 
 %        'dotback' 'mmn' 'resting' 'simon' 'sternberg'
 
@@ -60,7 +70,6 @@ end
 % can set ComputeBeamformer = 1 and specify your data / contrast parameters
 % below.
 
-mycfg.ComputeBeamformer = 1;
 
 % Optional: Only needed if mycfg.ComputeBeamformer = 1 ... 
 %==========================================================================
@@ -75,8 +84,6 @@ mycfg.trigger  = 'emg';  % trig/stim
 mycfg.b_toi    = [-1.25 -0.5];   % baseline times
 mycfg.a_toi    = [-0.25 0.5];  % active times
 
-mycfg.UseKrish1mm = 0;
-mycfg.Artifact = true;
 
 % the manual local part - coregistration
 if isempty(dir([mycfg.SaveSubDir '*CoReg.mat']))
@@ -93,10 +100,14 @@ mycfg.prepend = 'MRBD_';
 save(unique_name,'mycfg')
 
 % Compute the lead fields and beamformer on the cluster
-fprintf('Submitting job to cluster...\n');
-cd(mycfg.SaveSubDir);
-docluster_slurm_bfm('FieldtripLCMVBeamformer',unique_name);
 
+cd(mycfg.SaveSubDir);
+if runoncluster
+    fprintf('Submitting job to cluster...\n');
+    docluster_slurm_bfm('FieldtripLCMVBeamformer',unique_name);
+else
+    feval('FieldtripLCMVBeamformer',unique_name);
+end
 
 % Define stimulus & frequency parameters: REBUUND
 %--------------------------------------------------------------------------
@@ -106,9 +117,6 @@ mycfg.cov_toi  = [-1.25 1.75];
 mycfg.trigger  = 'emg';  % trig/stim 
 mycfg.b_toi    = [-1.25 -0.5];   % baseline times
 mycfg.a_toi    = [1 1.75];  % active times
-
-mycfg.UseKrish1mm = 0;
-mycfg.Artifact = true;
 
 % the manual local part - coregistration
 %if isempty(dir([mycfg.SaveSubDir '*CoReg.mat']))
@@ -125,9 +133,13 @@ mycfg.prepend = 'PMBR_';
 save(unique_name,'mycfg')
 
 % Compute the lead fields and beamformer on the cluster
-fprintf('Submitting job to cluster...\n');
-cd(mycfg.SaveSubDir);
-docluster_slurm_bfm('FieldtripLCMVBeamformer',unique_name);
 
+cd(mycfg.SaveSubDir);
+if runoncluster
+    fprintf('Submitting job to cluster...\n');
+    docluster_slurm_bfm('FieldtripLCMVBeamformer',unique_name);
+else
+    feval('FieldtripLCMVBeamformer',unique_name);
+end
 % or run locally:
 % FieldtripLCMVBeamformer(unique_name)
