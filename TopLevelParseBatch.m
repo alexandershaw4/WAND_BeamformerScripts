@@ -1,6 +1,8 @@
 
 addpath('~/code/WAND_BeamformerScripts/');
 
+force = 0;
+
 task = 'auditorymotor'; % {'visual' or 'auditorymotor'}
 
 switch task 
@@ -32,7 +34,7 @@ for i = 1:length(ID)
         end
         
         
-    if exist(local) && exist([local '/meg/' lower(task) '/preproc/' file '.mat'])
+    if exist(local) && exist([local '/meg/' lower(task) '/preproc/' file '.mat']) && ~force
         fprintf('ALREADY RUN!/n');
         hasrun{i} = this.id;
         continue;

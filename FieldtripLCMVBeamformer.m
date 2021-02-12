@@ -322,13 +322,13 @@ else
         if isfield(mycfg,'eogthreshold')
             eogcut = mycfg.eogthreshold;
         else
-            eogcut = 5;
+            eogcut = 6;
         end
         
         if isfield(mycfg,'jumpthreshold')
             jumpcut = mycfg.jumpthreshold;
         else
-            jumpcut = 35;
+            jumpcut = 20;
         end
         
         fprintf('Using EOG thresh: %d\n',eogcut);
@@ -388,7 +388,14 @@ else
         [cfg, artifact_EOG] = ft_artifact_zvalue(cfg);
 
         % now remove (nan)
-        cfg_data.artfctdef.reject          = 'complete';
+        if isfield(mycfg,'reject_type') && ~isempty(mycfg.reject_type)
+            rjtype = mycfg.reject_type;
+        else
+            rjtype = 'complete';
+        end
+            
+        
+        cfg_data.artfctdef.reject          = rjtype;
         cfg_data.artfctdef.feedback        =  'no' ;
         cfg_data.artfctdef.eog.artifact    = artifact_EOG;
         cfg_data.artfctdef.jump.artifact   = artifact_jump;

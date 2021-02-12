@@ -14,8 +14,8 @@ mycfg.Artifact = true;
 mycfg.ManualReject=0;
 
 % New - rejection thresholds
-mycfg.eogthreshold  = 4;  % 5
-mycfg.jumpthreshold = 20;  % 35
+mycfg.eogthreshold  = 6;  % 
+mycfg.jumpthreshold = 20;  % 
 
 % task = 'visual' 'auditorymotor' 'day3' 
 %        'dotback' 'mmn' 'resting' 'simon' 'sternberg'
@@ -86,7 +86,12 @@ t = clock;
 unique_name = [date '_' num2str(t(5)) num2str(round(t(6)))];
 unique_name = [mycfg.SaveSubDir unique_name];
 
+%mycfg.prepend = 'EOGthr6_';
+%mycfg.reject_type = 'partial';
+
+
 save(unique_name,'mycfg')
+
 
 % Compute the lead fields and beamformer on the cluster
 

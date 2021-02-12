@@ -13,8 +13,8 @@ mycfg.Artifact = true;
 mycfg.ManualReject=0;
 
 % New - rejection thresholds
-mycfg.eogthreshold  = 5;  % 5
-mycfg.jumpthreshold = 20;  % 35
+mycfg.eogthreshold  = 6;  %
+mycfg.jumpthreshold = 20;  % 
 
 % task = 'visual' 'auditorymotor' 'day3' 
 %        'dotback' 'mmn' 'resting' 'simon' 'sternberg'
