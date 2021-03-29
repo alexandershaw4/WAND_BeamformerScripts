@@ -60,8 +60,14 @@ for i = 1:size(woi,1)
     %[~,I] = mean(window);
     %I=I(1);
     
+    % also get a baseline measure
+    bwin = [findthenearest(-1.25,ftve.time{1}):findthenearest(-0.5,ftve.time{1})];
+    
+    bwindow = mean( m(iw,bwin),2 );
+    
     %pks(i).PeakFreq = FoI(iw(I));
     pks(i).MeanAmp = mean(window);
+    pks(i).BaseAmp = mean(bwindow);
     
 end
     

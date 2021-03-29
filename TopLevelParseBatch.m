@@ -3,7 +3,7 @@ addpath('~/code/WAND_BeamformerScripts/');
 
 force = 0;
 
-task = 'auditorymotor'; % {'visual' or 'auditorymotor'}
+task = 'visual'; % {'visual' or 'auditorymotor'}
 
 switch task 
     case 'auditorymotor'; ID = checkWANDmotor;

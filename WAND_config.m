@@ -14,8 +14,8 @@ mycfg.Artifact = true;
 mycfg.ManualReject=0;
 
 % New - rejection thresholds
-mycfg.eogthreshold  = 6;  % 
-mycfg.jumpthreshold = 20;  % 
+mycfg.eogthreshold  = 5;  % 
+mycfg.jumpthreshold = 35;  % 
 
 % task = 'visual' 'auditorymotor' 'day3' 
 %        'dotback' 'mmn' 'resting' 'simon' 'sternberg'
@@ -85,9 +85,6 @@ end
 t = clock;
 unique_name = [date '_' num2str(t(5)) num2str(round(t(6)))];
 unique_name = [mycfg.SaveSubDir unique_name];
-
-%mycfg.prepend = 'EOGthr6_';
-%mycfg.reject_type = 'partial';
 
 
 save(unique_name,'mycfg')

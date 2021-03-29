@@ -28,7 +28,8 @@ addpath(fieldtrip_path); cd(fieldtrip_path); ft_defaults
 cov_foi = mycfg.cov_fwin; %in Hz
 cov_toi = mycfg.cov_toi;  %in seconds
 
-
+% Where to save everything
+SaveDir = mycfg.SaveSubDir;
 
 % Stimulus and baseline time-range (for beamformer contrast)
 %--------------------------------------------------------------------------
@@ -142,8 +143,8 @@ else
         cfg                     = [];
         cfg.dataset             = dataset;
         cfg.trialdef.eventtype  = mycfg.trigger;
-        cfg.trialdef.prestim    = abs(bsln_toi(1));   ...  * ^
-        cfg.trialdef.poststim   = abs(actv_toi(2));   ...  * ^
+        cfg.trialdef.prestim    = abs(mycfg.cov_toi(1));
+        cfg.trialdef.poststim   = abs(mycfg.cov_toi(2));
         cfg_data                = ft_definetrial(cfg);
     end
 
@@ -227,7 +228,7 @@ else
         % algorithmic parameters
         cfg.artfctdef.zvalue.bpfilter   = 'yes';
         cfg.artfctdef.zvalue.bpfilttype = 'but';
-        cfg.artfctdef.zvalue.bpfreq     = [2 15];
+        cfg.artfctdef.zvalue.bpfreq     = [1 20];
         cfg.artfctdef.zvalue.bpfiltord  = 4;
         cfg.artfctdef.zvalue.hilbert    = 'yes';
 

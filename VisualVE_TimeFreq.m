@@ -8,7 +8,7 @@ if nargin < 4 || isempty(saveim)
 end
 
 if nargin < 3 || isempty(woi)
-    woi = [0 .3; .3 1];
+    woi = [0 .3; .3 1.3];
 end
 
 if nargin < 2 || isempty(foi)

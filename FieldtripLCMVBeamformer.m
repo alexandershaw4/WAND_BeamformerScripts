@@ -262,11 +262,11 @@ else
 
         cfg                     = [];
         cfg.dataset             = dataset;    
-        %cfg.trialdef.prestim    = abs(bsln_toi(1));
-        %cfg.trialdef.poststim   = abs(actv_toi(2));
+        cfg.trialdef.prestim    = abs(bsln_toi(1));
+        cfg.trialdef.poststim   = abs(actv_toi(2));
         
-        cfg.trialdef.prestim  = abs(mycfg.cov_toi(1));
-        cfg.trialdef.poststim = abs(mycfg.cov_toi(2));
+        %cfg.trialdef.prestim  = abs(mycfg.cov_toi(1));
+        %cfg.trialdef.poststim = abs(mycfg.cov_toi(2));
 
         event=ev;
         trl=[];
@@ -294,8 +294,8 @@ else
         cfg                     = [];
         cfg.dataset             = dataset;
         cfg.trialdef.eventtype  = mycfg.trigger;
-        cfg.trialdef.prestim    = abs(bsln_toi(1));   ...  * ^
-        cfg.trialdef.poststim   = abs(actv_toi(2));   ...  * ^
+        cfg.trialdef.prestim    = abs(bsln_toi(1));
+        cfg.trialdef.poststim   = abs(actv_toi(2));
         cfg_data                = ft_definetrial(cfg);
     end
 
@@ -379,7 +379,7 @@ else
         % algorithmic parameters
         cfg.artfctdef.zvalue.bpfilter   = 'yes';
         cfg.artfctdef.zvalue.bpfilttype = 'but';
-        cfg.artfctdef.zvalue.bpfreq     = [2 15];
+        cfg.artfctdef.zvalue.bpfreq     = [2 20];
         cfg.artfctdef.zvalue.bpfiltord  = 4;
         cfg.artfctdef.zvalue.hilbert    = 'yes';
 
@@ -453,32 +453,30 @@ cfg.covariance = 'yes';
 cfg.covariancewindow = cov_toi;% [-1.5 1.5];
 data_tlck = ft_timelockanalysis(cfg, data_preproc);
 
-
-
-
-
-
-
-
-
-% Compute common weights
-%--------------------------------------------------------------------------
-cfg                             = [];
-cfg.method                      = beam_method;% 'lcmv';
-cfg.grid                        = leadfield;
-cfg.headmodel                   = hdm;
-cfg.grad                        = grad;
-cfg.(beam_method).fixedori      = 'yes';
-cfg.(beam_method).keepfilter    = 'yes';
-cfg.(beam_method).projectnoise  = 'yes';
-cfg.(beam_method).lambda        = '5%'; 
-src                             = ft_sourceanalysis(cfg, data_tlck);
-src                             = rmfield(src,'cfg'); 
-
-if any(prepend)
-    save([SaveDir, prepend, 'CommonWeights'], '-struct', 'src')
+if exist([SaveDir, prepend, 'CommonWeights'])
+    src = save([SaveDir, prepend, 'CommonWeights']);
+    fprintf('Using precomputed weights...\n');
 else
-    save([SaveDir, 'CommonWeights'], '-struct', 'src')
+
+    % Compute common weights
+    %--------------------------------------------------------------------------
+    cfg                             = [];
+    cfg.method                      = beam_method;% 'lcmv';
+    cfg.grid                        = leadfield;
+    cfg.headmodel                   = hdm;
+    cfg.grad                        = grad;
+    cfg.(beam_method).fixedori      = 'yes';
+    cfg.(beam_method).keepfilter    = 'yes';
+    cfg.(beam_method).projectnoise  = 'yes';
+    cfg.(beam_method).lambda        = '5%'; 
+    src                             = ft_sourceanalysis(cfg, data_tlck);
+    src                             = rmfield(src,'cfg'); 
+
+    if any(prepend)
+        save([SaveDir, prepend, 'CommonWeights'], '-struct', 'src')
+    else
+        save([SaveDir, 'CommonWeights'], '-struct', 'src')
+    end
 end
 
 % Get the (common) beamformer weights & save on their own for easy access

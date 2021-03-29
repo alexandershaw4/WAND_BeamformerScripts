@@ -28,10 +28,10 @@ figure('position',[252 290 1434 490]);
 x = load('DenseAAL.mat')
 
 s(1) = subplot(121);
-D0=atemplate('sourcemodel',p(i,:),'overlay',mrbdp(i),'fighnd',s(1),'post_parcel',{x.v,x.vi});
+D0=atemplate('mesh','def2','sourcemodel',p(i,:),'overlay',mrbdp(i),'fighnd',s(1),'post_parcel',{x.v,x.vi});
 
 s(2) = subplot(122);
-D1=atemplate('sourcemodel',p(i,:),'overlay',pmbrp(i),'fighnd',s(2),'post_parcel',{x.v,x.vi});
+D1=atemplate('mesh','def2','sourcemodel',p(i,:),'overlay',pmbrp(i),'fighnd',s(2),'post_parcel',{x.v,x.vi});
 
 
 figure('position',[252 290 1434 490]);

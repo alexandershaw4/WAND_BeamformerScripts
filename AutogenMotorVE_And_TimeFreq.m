@@ -65,6 +65,8 @@ for i = 1:length(list)
     p.id = subid;
     p.MeanBetaL = pksL(1).MeanAmp;
     p.MeanBetaR = pksR(1).MeanAmp;
+    p.MeanBetaL_base = pksL(1).BaseAmp;
+    p.MeanBetaR_base = pksR(1).BaseAmp;
     
     PeakData(i) = p;
     

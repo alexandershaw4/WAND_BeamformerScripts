@@ -22,5 +22,6 @@ p = pos_template;
 % stack into new matrices and render with atemplate
 source = [p0;p];
 overlay = [p0(:,1)*0;pow];
-addpath(genpath('~/code/SourceMesh/'))
-afigure;atemplate('sourcemodel',source,'overlay',overlay,'open');
+addpath(genpath('~/code/SourceMesh/'));
+mesh = 'def2';
+afigure;atemplate('mesh',mesh,'sourcemodel',source,'overlay',overlay,'open');

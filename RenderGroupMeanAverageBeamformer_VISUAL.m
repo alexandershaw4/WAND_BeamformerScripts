@@ -46,7 +46,7 @@ addpath(genpath('~/code/SourceMesh/'))
 % REDNER ON A BRAIN USING ATEMPLATE
 figure('position',[343 119 1348 649]);
 
-D0=atemplate('mesh','def4','sourcemodel',source,'overlay',overlay,'open');
+D0=atemplate('mesh','def2','sourcemodel',source,'overlay',overlay,'open');
 
 savefig('GroupMeanVisualOverlay.fig');
 

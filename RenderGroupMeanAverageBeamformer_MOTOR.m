@@ -55,16 +55,16 @@ mesh.faces    = nmesh.faces;
 
 s(1) = subplot(121);
 D0=atemplate('mesh',mesh,'sourcemodel',p(i,:),'overlay',mrbdpm,'fighnd',s(1),'post_parcel',{x.v,x.vi});
-D0.overlay.cb.CRange = D0.overlay.cb.CRange*1.8;
+D0.overlay.cb.CRange = D0.overlay.cb.CRange*1;
 D0.overlay.cb.CLim = D0.overlay.cb.CRange;
 
 s(2) = subplot(122);
 D1=atemplate('mesh',mesh,'sourcemodel',p(i,:),'overlay',pmbrpm,'fighnd',s(2),'post_parcel',{x.v,x.vi});
 
 
-figure('position',[252 290 1434 490]);
-s(1) = subplot(121);
-atemplate('overlay',D0.post_parcel.ParVal,'sourcemodel',D0.post_parcel.pos,'fighnd',s(1));
-s(2) = subplot(122);
-atemplate('overlay',D1.post_parcel.ParVal,'sourcemodel',D1.post_parcel.pos,'fighnd',s(2));
+% figure('position',[252 290 1434 490]);
+% s(1) = subplot(121);
+% atemplate('overlay',D0.post_parcel.ParVal,'sourcemodel',D0.post_parcel.pos,'fighnd',s(1));
+% s(2) = subplot(122);
+% atemplate('overlay',D1.post_parcel.ParVal,'sourcemodel',D1.post_parcel.pos,'fighnd',s(2));
 
