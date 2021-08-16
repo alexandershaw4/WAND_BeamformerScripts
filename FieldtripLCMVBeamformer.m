@@ -294,8 +294,8 @@ else
         cfg                     = [];
         cfg.dataset             = dataset;
         cfg.trialdef.eventtype  = mycfg.trigger;
-        cfg.trialdef.prestim    = abs(bsln_toi(1));
-        cfg.trialdef.poststim   = abs(actv_toi(2));
+        cfg.trialdef.prestim    = abs(mycfg.epochtime(1));
+        cfg.trialdef.poststim   = abs(mycfg.epochtime(2));
         cfg_data                = ft_definetrial(cfg);
     end
 
@@ -431,30 +431,57 @@ else
 
 end
 
+% Check if we've already preprocessed the data
+if exist([SaveDir, prepend, 'PreprocData.mat'])
+    load([SaveDir, prepend, 'PreprocData'], 'data_preproc')
+    fprintf('Loading existing preproc data...\n');
+else
 
+    % Pre-process the data
+    %--------------------------------------------------------------------------
+    cfg_data.channel    = {'meg'};%{'-MRCNT*','-*STAT*','-MP*','-MM*','-MRSYN*'}';%{'MEG'};
+    cfg_data.precision  = 'single';
+    cfg_data.demean     = 'yes';
+    cfg_data.bpfilter   = 'yes';
+    cfg_data.bpfreq     = cov_foi;
+    cfg_data.bpfilttype = 'but';
+    cfg_data.bpfiltdir  = 'twopass';
+    data_preproc    = ft_preprocessing(cfg_data);
+    
+%     cfg_data.bpfreq       = mycfg.foi;
+%     data_preproc = ft_preprocessing(cfg_data);    
 
-% Pre-process the data
-%--------------------------------------------------------------------------
-cfg_data.channel    = {'meg'};%{'-MRCNT*','-*STAT*','-MP*','-MM*','-MRSYN*'}';%{'MEG'};
-cfg_data.precision  = 'single';
-cfg_data.demean     = 'yes';
-cfg_data.bpfilter   = 'yes';
-cfg_data.bpfreq     = cov_foi;
-cfg_data.bpfilttype = 'but';
-cfg_data.bpfiltdir  = 'twopass';
-data_preproc        = ft_preprocessing(cfg_data);
+    if any(prepend)
+        save([SaveDir, prepend, 'PreprocData'], 'data_preproc')
+    else
+        save([SaveDir, 'PreprocData'], 'data_preproc');
+    end    
+end
+    
+% Check if we've already preprocessed the data
+if exist([SaveDir, prepend, 'TlckData.mat'])
+    load([SaveDir, prepend, 'TlckData'], 'data_tlck')
+    fprintf('Loading existing timelock/covar data...\n');
+else
 
-% Compute the covariance
-%--------------------------------------------------------------------------
-cfg = [];
-cfg.channel = {'MEG'};
-cfg.removemean = 'no';
-cfg.covariance = 'yes';
-cfg.covariancewindow = cov_toi;% [-1.5 1.5];
-data_tlck = ft_timelockanalysis(cfg, data_preproc);
+    % Compute the covariance
+    %--------------------------------------------------------------------------
+    cfg = [];
+    cfg.channel = {'MEG'};
+    cfg.removemean = 'no';
+    cfg.covariance = 'yes';
+    cfg.covariancewindow = cov_toi;% [-1.5 1.5];
+    data_tlck = ft_timelockanalysis(cfg, data_preproc);
+     
+    if any(prepend)
+        save([SaveDir, prepend, 'TlckData'], 'data_tlck')
+    else
+        save([SaveDir, 'TlckData'], 'data_tlck');
+    end    
+end
 
-if exist([SaveDir, prepend, 'CommonWeights'])
-    src = save([SaveDir, prepend, 'CommonWeights']);
+if exist([SaveDir, prepend, 'CommonWeights.mat'])
+    load([SaveDir, prepend, 'CommonWeights'],'src');
     fprintf('Using precomputed weights...\n');
 else
 
@@ -473,18 +500,23 @@ else
     src                             = rmfield(src,'cfg'); 
 
     if any(prepend)
-        save([SaveDir, prepend, 'CommonWeights'], '-struct', 'src')
+        save([SaveDir, prepend, 'CommonWeights'], 'src')
     else
-        save([SaveDir, 'CommonWeights'], '-struct', 'src')
+        save([SaveDir, 'CommonWeights'], 'src')
     end
 end
 
 % Get the (common) beamformer weights & save on their own for easy access
-wts = src.avg.filter;
-if any(prepend)
-    save([SaveDir, prepend, 'CommonwightsMat'], 'wts')
+if exist([SaveDir, prepend, 'CommonwightsMat.mat'])
+    fprintf('weights already saved...\n');
+    load([SaveDir, prepend, 'CommonwightsMat'], 'wts')
 else
-    save([SaveDir, 'CommonwightsMat'], 'wts')
+    wts = src.avg.filter;
+    if any(prepend)
+        save([SaveDir, prepend, 'CommonwightsMat'], 'wts')
+    else
+        save([SaveDir, 'CommonwightsMat'], 'wts')
+    end
 end
 
 % Define baseline and stimulus epochs  -
@@ -506,53 +538,85 @@ tlck_bsln       = ft_timelockanalysis(cfg, data_bsln);
 tlck_actv       = ft_timelockanalysis(cfg, data_actv);
 
 
-% Get source power estimates separately for bsln and actv - using the
-% common weights
-%--------------------------------------------------------------------------
-cfg                             = [];
-cfg.method                      = beam_method;
-cfg.grid                        = leadfield;   % precomputed leadfield
-cfg.grid.filter                 = wts;         % precomputed common weights
-cfg.headmodel                   = hdm;         % headmodel
-cfg.grad                        = grad;        % gradiomter positions
-cfg.keeptrials                  = 'yes';
-cfg.(beam_method).fixedori      = 'yes';
-cfg.(beam_method).keepfilter    = 'no';
-cfg.(beam_method).projectnoise  = 'yes';
-cfg.(beam_method).lambda        = '5%'; 
 
-% Pass the baseline data through 
-src_bsln = ft_sourceanalysis(cfg, tlck_bsln);
-src_bsln = rmfield(src_bsln,'cfg'); 
-src_bsln.pos_template = template_sourcemodel.pos;
-src_bsln.dim_template = template_sourcemodel.dim;
+% Check if we've already passed the data through the beamformer
+%if exist([SaveDir, prepend, 'SourceActive.mat']) && exist([SaveDir, prepend, 'SourceBaseline.mat'])
+   % load([SaveDir, prepend, 'SourceActive'], 'src_actv')
+   % load([SaveDir, prepend, 'SourceBaseline'], 'src_bsln')
+   % fprintf('Loading existing source space data...\n');
+%else
 
-% Pass the stimulus data through 
-src_actv = ft_sourceanalysis(cfg, tlck_actv);
-src_actv = rmfield(src_actv,'cfg');
-src_actv.pos_template = template_sourcemodel.pos;
-src_actv.dim_template = template_sourcemodel.dim;
+
+    % Get source power estimates separately for bsln and actv - using the
+    % common weights
+    %--------------------------------------------------------------------------
+    cfg                             = [];
+    cfg.method                      = beam_method;
+    cfg.grid                        = leadfield;   % precomputed leadfield
+    cfg.grid.filter                 = wts;         % precomputed common weights
+    cfg.headmodel                   = hdm;         % headmodel
+    cfg.grad                        = grad;        % gradiomter positions
+    cfg.keeptrials                  = 'yes';
+    cfg.(beam_method).fixedori      = 'yes';
+    cfg.(beam_method).keepfilter    = 'no';
+    cfg.(beam_method).projectnoise  = 'yes';
+    cfg.(beam_method).lambda        = '5%'; 
+
+    % Pass the baseline data through 
+    src_bsln = ft_sourceanalysis(cfg, tlck_bsln);
+    src_bsln = rmfield(src_bsln,'cfg'); 
+    src_bsln.pos_template = template_sourcemodel.pos;
+    src_bsln.dim_template = template_sourcemodel.dim;
+
+    src_bsln.avgpow = src_bsln.avg.pow;
+    
+    % Pass the stimulus data through 
+    src_actv = ft_sourceanalysis(cfg, tlck_actv);
+    src_actv = rmfield(src_actv,'cfg');
+    src_actv.pos_template = template_sourcemodel.pos;
+    src_actv.dim_template = template_sourcemodel.dim;
+      
+    src_actv.avgpow = src_actv.avg.pow;
+    
+%     if ~exist([SaveDir, prepend, 'SourceActive.mat']) && ~exist([SaveDir, prepend, 'SourceBaseline.mat'])
+%         if any(prepend)
+%             save([SaveDir, prepend, 'SourceBaseline'], '-struct', 'src_bsln')
+%             save([SaveDir, prepend, 'SourceActive']  , '-struct', 'src_actv')
+%         else
+%             save([SaveDir, 'SourceBaseline'], '-struct', 'src_bsln')
+%             save([SaveDir, 'SourceActive']  , '-struct', 'src_actv')
+%         end    
+%     end
+    
+%end
 
 % Compute the actual CONTRAST:
 % - Difference in power as a percentage change from baseline
 %--------------------------------------------------------------------------
-cfg           = [];
-cfg.parameter = 'avg.pow';
-cfg.operation = '((x1-x2)./x2)*100';
-src_diff      = ft_math(cfg, src_actv, src_bsln);
-src_diff.pos_native   = src_diff.pos;
-src_diff.pos_template = template_sourcemodel.pos;
+%if exist([SaveDir, prepend, 'SourceContrast.mat']) 
+%    load([SaveDir, prepend, 'SourceContrast'], 'src_diff')
+%    fprintf('Loading existing source contrast...\n');
+%else
+    src_bsln.time=src_actv.time; % fieldtrip performs a check that the 
+    % active and baseline periods are the same length, however theres no
+    % reason for this, so just make bsln the same as actv to trick it...
+    cfg           = [];
+    cfg.parameter = 'avg.pow';
+    cfg.operation = '((x1-x2)./x2)*100';
+    src_diff      = ft_math(cfg, src_actv, src_bsln);
+    src_diff.pos_native   = src_diff.pos;
+    src_diff.pos_template = template_sourcemodel.pos;
 
-% Save source estimates...
-if any(prepend)
-    save([SaveDir, prepend, 'SourceBaseline'], '-struct', 'src_bsln')
-    save([SaveDir, prepend, 'SourceActive']  , '-struct', 'src_actv')
-    save([SaveDir, prepend, 'SourceContrast'], '-struct', 'src_diff')
-else
-    save([SaveDir, 'SourceBaseline'], '-struct', 'src_bsln')
-    save([SaveDir, 'SourceActive']  , '-struct', 'src_actv')
-    save([SaveDir, 'SourceContrast'], '-struct', 'src_diff')
-end
+    % Save source estimates...
+    if ~exist([SaveDir, prepend, 'SourceContrast.mat']) 
+        if any(prepend) 
+            save([SaveDir, prepend, 'SourceContrast'], 'src_diff')
+        else
+            save([SaveDir, 'SourceContrast'], 'src_diff')
+        end
+    end
+    
+%end
 
 % Interpolate (in native space) & Save
 %--------------------------------------------------------------------------

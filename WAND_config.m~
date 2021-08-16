@@ -7,6 +7,15 @@ wand    = '/cubric/collab/314_wand/bids/sourcedata/';
 task    = 'visual';    
 
 runoncluster = 0;
+mycfg.ComputeBeamformer = 1;
+
+mycfg.UseKrish1mm = 1;
+mycfg.Artifact = true;
+mycfg.ManualReject=0;
+
+% New - rejection thresholds
+mycfg.eogthreshold  = 5;  % 
+mycfg.jumpthreshold = 35;  % 
 
 % task = 'visual' 'auditorymotor' 'day3' 
 %        'dotback' 'mmn' 'resting' 'simon' 'sternberg'
@@ -51,7 +60,6 @@ unix(['mkdir -p ' mycfg.SaveSubDir]);
 % can set ComputeBeamformer = 1 and specify your data / contrast parameters
 % below.
 
-mycfg.ComputeBeamformer = 1;
 
 % Optional: Only needed if mycfg.ComputeBeamformer = 1 ... 
 %==========================================================================
@@ -60,18 +68,13 @@ mycfg.ComputeBeamformer = 1;
 % Define stimulus & frequency parameters
 %--------------------------------------------------------------------------
 mycfg.cov_fwin = [30 80];
-mycfg.cov_toi  = [0 1.5];
+mycfg.cov_toi  = [0 4];
 
 mycfg.trigger  = 'stim_on';  % trig/stim 
-mycfg.b_toi    = [-1.2 0];   % baseline times
-mycfg.a_toi    = [0.3 1.5];  % active times
+mycfg.b_toi    = [-2 0];   % baseline times
+mycfg.a_toi    = [0 4];  % active times
 
-mycfg.UseKrish1mm = 1;
-mycfg.Artifact = true;
-mycfg.ManualReject=1;
-% New - rejection thresholds
-mycfg.eogthreshold  = 5;  % 5
-mycfg.jumpthreshold = 35;  % 35
+
 
 % the manual local part - coregistration
 if isempty(dir([mycfg.SaveSubDir '*CoReg.mat']))
@@ -83,7 +86,10 @@ t = clock;
 unique_name = [date '_' num2str(t(5)) num2str(round(t(6)))];
 unique_name = [mycfg.SaveSubDir unique_name];
 
+%mycfg.prepend = subject;
+
 save(unique_name,'mycfg')
+
 
 % Compute the lead fields and beamformer on the cluster
 

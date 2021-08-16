@@ -8,7 +8,7 @@ if nargin < 4 || isempty(saveim)
 end
 
 if nargin < 3 || isempty(woi)
-    woi = [0 .3; .3 1.3];
+    woi = [0 .3; .3 2];
 end
 
 if nargin < 2 || isempty(foi)
@@ -32,7 +32,7 @@ MatDat = cat(1,ftve.trial{:});
 %     ftve.time{i} = ftve.time{i}(win); 
 % end
 
-tf = bert_singlechannel(MatDat,cfg,FoI,[-1 0]);
+tf = bert_singlechannel(MatDat,cfg,FoI,[-2 0]);
 
 figure;p=plotbert(ftve.time{1},tf.freqs,tf.agram,100);
 

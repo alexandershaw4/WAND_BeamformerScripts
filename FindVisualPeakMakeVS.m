@@ -4,6 +4,11 @@ cd(subdir)
 
 load SourceContrast
 
+fn = fieldnames(src_diff);
+for i = 1:length(fn)
+    eval([fn{i} '= src_diff.(fn{i});'])
+end
+
 [~,I]=max(pow);
 
 loc_nat = pos(I,:);
@@ -19,7 +24,7 @@ load CommonwightsMat.mat
 optfile = dir('*2021*.mat'); load(optfile.name,'mycfg')
 
 % make active time the whole window of interest for the virtualelectrode
-mycfg.a_toi = [-1 3];
+mycfg.a_toi = [-2 4];
 
 % read, preprocess etc with same parameters as when generating beamformer
 [tlck_actv,tlck_bsln] = ReloadDataOptionsForVS(mycfg);

@@ -68,13 +68,14 @@ unix(['mkdir -p ' mycfg.SaveSubDir]);
 % Define stimulus & frequency parameters
 %--------------------------------------------------------------------------
 mycfg.cov_fwin = [30 80];
-mycfg.cov_toi  = [0 1.5];
+mycfg.cov_toi  = [-2 4];
 
 mycfg.trigger  = 'stim_on';  % trig/stim 
-mycfg.b_toi    = [-1.2 0];   % baseline times
-mycfg.a_toi    = [0.3 1.5];  % active times
-
-
+mycfg.b_toi    = [-1 0];   % baseline times
+mycfg.a_toi    = [0 2];  % active times
+ 
+mycfg.epochtime = [-2 4];
+mycfg.foi = [1 100];
 
 % the manual local part - coregistration
 if isempty(dir([mycfg.SaveSubDir '*CoReg.mat']))
@@ -86,6 +87,7 @@ t = clock;
 unique_name = [date '_' num2str(t(5)) num2str(round(t(6)))];
 unique_name = [mycfg.SaveSubDir unique_name];
 
+%mycfg.prepend = subject;
 
 save(unique_name,'mycfg')
 

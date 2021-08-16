@@ -15,6 +15,13 @@ i0 = find(sm.inside);
 %alpha .4;hold on;
 
 load('SourceContrast.mat')
+
+fn = fieldnames(src_diff);
+for i = 1:length(fn)
+    eval([fn{i} '= src_diff.(fn{i});'])
+end
+
+
 i = inside;
 p = pos_template;
 %scatter3(p(i,1),p(i,2),p(i,3),100,pow(i),'filled')

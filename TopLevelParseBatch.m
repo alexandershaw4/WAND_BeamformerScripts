@@ -29,7 +29,7 @@ for i = 1:length(ID)
         '/cubric/newscratch/314_wand/');
     
         switch task
-            case 'visual'; file = 'CommonWeights';
+            case 'visual'; file = 'SourceContrast';
             case 'auditorymotor'; file = 'PMBR_CommonWeights';
         end
         
